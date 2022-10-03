@@ -29,14 +29,6 @@ inputs:
     description: 'MSSQL_DATABASE - name for the default database that is created'
     required: false
     default: ''
-  mssql user:
-    description: 'MSSQL_USER - create the specified user with superuser power for created database'
-    required: false
-    default: ''
-  mssql password:
-    description: 'MSSQL_PASSWORD - specified superuser password which user is power for created database'
-    required: false
-    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
