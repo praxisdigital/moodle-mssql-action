@@ -1,0 +1,42 @@
+name: 'Setup MS SQL'
+description: 'Setup a MS SQL database'
+author: 'Praxis A/S'
+branding:
+  icon: 'database'
+  color: 'orange'
+inputs:
+  host port:
+    description: 'The port of host'
+    required: false
+    default: 1433
+  container port:
+    description: 'The port of container'
+    required: false
+    default: 1433
+  collation server:
+    description: '--collation-server - The character collation of MS SQL server'
+    required: false
+    default: 'Latin1_General_CI_AS'
+  mssql version:
+    description: 'Version of MS SQL to use'
+    required: false
+    default: 'server:2022-latest'
+  mssql root password:
+    description: 'MSSQL_SA_PASSWORD - root superuser password'
+    required: false
+    default: ''
+  mssql database:
+    description: 'MSSQL_DATABASE - name for the default database that is created'
+    required: false
+    default: ''
+  mssql user:
+    description: 'MSSQL_USER - create the specified user with superuser power for created database'
+    required: false
+    default: ''
+  mssql password:
+    description: 'MSSQL_PASSWORD - specified superuser password which user is power for created database'
+    required: false
+    default: ''
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
