@@ -1,0 +1,58 @@
+name: Test MS SQL server
+on:
+  pull_request:
+  push:
+
+env:
+  dbtype: 'sqlsrv'
+
+jobs:
+  MSSQLTest:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            experimental: false
+
+    steps:
+      - name: Setup ${{ github.repository }}
+        uses: actions/checkout@v4
+
+      - name: Setting up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          ini-values: 'max_input_vars=5000'
+
+      - name: Clone moodle/moodle
+        uses: actions/checkout@v4
+        with:
+          repository: moodle/moodle
+          ref: ${{ matrix.moodle }}
+
+      - name: Clone plugin from ${{ github.repository }}
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.workspace }}/repos/moodle-mssql-action
+          ref: ${{ github.ref }}
+
+      - name: Setup plugin
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/moodle/local/testmssql
+          cp -r $GITHUB_WORKSPACE/repos/moodle-mssql-action/moodle/local/testmssql $GITHUB_WORKSPACE/moodle/local/testmssql
+
+      - name: Setup moodle
+        run: |
+          echo "pathtophp=$(which php)" >> $GITHUB_ENV # Inject installed pathtophp to env. The template config needs it.
+          cp $GITHUB_WORKSPACE/.github/workflows/config-template.php $GITHUB_WORKSPACE/config.php
+          mkdir $GITHUB_WORKSPACE/../moodledata
+          sudo locale-gen en_AU.UTF-8
+          php $GITHUB_WORKSPACE/admin/tool/phpunit/cli/init.php --no-composer-self-update
+
+      - name: Running PHPUnit tests
+        env:
+          dbtype: ${{ matrix.db }}
+        run: $GITHUB_WORKSPACE/vendor/bin/phpunit -c $GITHUB_WORKSPACE/phpunit.xml --testsuite=local_testmssql_testsuite --testdox -v

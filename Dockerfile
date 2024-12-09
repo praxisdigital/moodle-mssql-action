@@ -8,4 +8,4 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /initialize.sh
 RUN chmod +x /entrypoint.sh
 
-CMD /bin/bash ./entrypoint.sh
+CMD /bin/bash /entrypoint.sh
