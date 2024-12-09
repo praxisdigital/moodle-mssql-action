@@ -1,34 +1,46 @@
 name: 'Setup MS SQL'
 description: 'Setup a MS SQL database'
-author: 'Praxis A/S'
+author: 'moxis'
 branding:
   icon: 'database'
-  color: 'orange'
+  color: 'purple'
 inputs:
-  host port:
+  host-port:
     description: 'The port of host'
     required: false
     default: 1433
-  container port:
+  container-port:
     description: 'The port of container'
     required: false
     default: 1433
-  collation server:
+  collation-server:
     description: '--collation-server - The character collation of MS SQL server'
     required: false
     default: 'Latin1_General_CI_AS'
-  mssql version:
+  mssql-version:
     description: 'Version of MS SQL to use'
     required: false
-    default: 'server:2022-latest'
-  mssql root password:
+    default: '2022-latest'
+  mssql-root-password:
     description: 'MSSQL_SA_PASSWORD - root superuser password'
     required: false
-    default: ''
-  mssql database:
+    default: '123qweASD'
+  mssql-database:
     description: 'MSSQL_DATABASE - name for the default database that is created'
     required: false
-    default: ''
+    default: 'test'
+  mssql-user:
+    description: 'MSSQL_USER - name for the default user that is created'
+    required: false
+    default: 'test'
+  mssql-password:
+    description: 'MSSQL_PASSWORD - password for the default user that is created'
+    required: false
+    default: 'test'
+  mssql-tools-path:
+    description: 'Path to mssql-tools. This is used to run sqlcmd for creating custom databases, users, etc.'
+    required: false
+    default: '/opt/mssql-tools18/bin/sqlcmd'
 runs:
   using: 'docker'
   image: 'Dockerfile'
