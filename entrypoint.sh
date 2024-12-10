@@ -15,4 +15,4 @@ INPUT_CONTAINER_PORT=${INPUT_CONTAINER_PORT:-1433}
 # Host port
 INPUT_HOST_PORT=${INPUT_HOST_PORT:-1433}
 
-./initialize.sh & /opt/mssql/bin/sqlservr &
+/initialize.sh & /opt/mssql/bin/sqlservr &

@@ -14,10 +14,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
+            moodle: 'MOODLE_404_STABLE'
             experimental: false
 
     steps:
-      - name: Setup ${{ github.repository }}
+      - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
 
       - name: Setting up PHP ${{ matrix.php }}
@@ -27,22 +28,22 @@ jobs:
           coverage: none
           ini-values: 'max_input_vars=5000'
 
-      - name: Clone moodle/moodle
+      - name: Install MS SQL server driver
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+          sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+          source ~/.bashrc
+          sudo apt-get install -y unixodbc-dev
+
+      - name: Checkout moodle/moodle
         uses: actions/checkout@v4
         with:
           repository: moodle/moodle
           ref: ${{ matrix.moodle }}
-
-      - name: Clone plugin from ${{ github.repository }}
-        uses: actions/checkout@v4
-        with:
-          path: ${{ github.workspace }}/repos/moodle-mssql-action
-          ref: ${{ github.ref }}
-
-      - name: Setup plugin
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/moodle/local/testmssql
-          cp -r $GITHUB_WORKSPACE/repos/moodle-mssql-action/moodle/local/testmssql $GITHUB_WORKSPACE/moodle/local/testmssql
 
       - name: Setup moodle
         run: |
@@ -53,6 +54,4 @@ jobs:
           php $GITHUB_WORKSPACE/admin/tool/phpunit/cli/init.php --no-composer-self-update
 
       - name: Running PHPUnit tests
-        env:
-          dbtype: ${{ matrix.db }}
         run: $GITHUB_WORKSPACE/vendor/bin/phpunit -c $GITHUB_WORKSPACE/phpunit.xml --testsuite=local_testmssql_testsuite --testdox -v
