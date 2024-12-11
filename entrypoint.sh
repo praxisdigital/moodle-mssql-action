@@ -36,10 +36,10 @@ fi
 
 # Build image
 image_name="moxis/moodle-mssql-action"
-docker build \
+docker build . \
     -t $image_name \
-    --build-arg VERSION=${version} \
-    -f mssql.Dockerfile .
+    -f mssql.Dockerfile \
+    --build-arg VERSION=${version}
 
 # Generate a random container name
 id=$(tr -dc a-z0-9 </dev/urandom | head -c 10)
