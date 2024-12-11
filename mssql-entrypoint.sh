@@ -1,0 +1,3 @@
+/mssql-init.sh &
+
+exec "$@"

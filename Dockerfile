@@ -1,14 +1,11 @@
-FROM mcr.microsoft.com/mssql/server:${MSSQL_VERSION:-2022-latest}
+FROM docker:stable
 
-USER root
+COPY ./entrypoint.sh /entrypoint.sh
+COPY ./mssql-init.sh /mssql-init.sh
+COPY ./mssql-entrypoint.sh /mssql-entrypoint.sh
 
-ENV ACCEPT_EULA=Y
+RUN chmod +x /entrypoint.sh /mssql-init.sh /mssql-entrypoint.sh
 
-COPY initialize.sh /initialize.sh
-COPY entrypoint.sh /entrypoint.sh
+RUN apk add --no-cache bash
 
-RUN chmod +x /initialize.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT [ "/bin/bash", "/entrypoint.sh" ]
-CMD [ "/opt/mssql/bin/sqlservr" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
