@@ -37,10 +37,10 @@ fi
 # Build image
 image_name="moxis/moodle-mssql-action"
 printf "Building image %s\n" $image_name
-docker build . \
+builder="docker build . \
     -t $image_name \
     -f /mssql.Dockerfile \
-    --build-arg VERSION=${version}
+    --build-arg VERSION=${version}"
 
 # Generate a random container name
 id=$(tr -dc a-z0-9 </dev/urandom | head -c 10)
@@ -49,7 +49,7 @@ container_name="mssql-server-$id"
 printf "Starting container %s\n" $container_name
 
 # Run the container
-command="docker run -d --rm\
+runner="docker run -d --rm\
     --name $container_name \
     -p ${host_port}:${container_port} \
     -e ACCEPT_EULA='Y' \
@@ -60,4 +60,4 @@ command="docker run -d --rm\
     -e INPUT_MSSQL_DATABASE=${db_name} \
     $image_name:latest"
 
-sh -c "$command"
+sh -c "$builder && $runner"
