@@ -1,53 +1,60 @@
 #!/bin/sh
 
-_sa_pass=${INPUT_MSSQL_ROOT_PASSWORD}
-_db_user=${INPUT_MSSQL_USER}
-_db_password=${INPUT_MSSQL_PASSWORD}
-_db_name=${INPUT_MSSQL_DATABASE}
-_version=${INPUT_VERSION:-2022-latest}
-_container_port=${INPUT_CONTAINER_PORT:-1433}
-_host_port=${INPUT_HOST_PORT:-1433}
+sa_pass=${INPUT_MSSQL_ROOT_PASSWORD}
+db_user=${INPUT_MSSQL_USER}
+db_password=${INPUT_MSSQL_PASSWORD}
+db_name=${INPUT_MSSQL_DATABASE}
+version=${INPUT_VERSION:-2022-latest}
+container_port=${INPUT_CONTAINER_PORT:-1433}
+host_port=${INPUT_HOST_PORT:-1433}
 
 # Validate inputs
-if [ -z "${_version}" ]; then
+if [ -z "${version}" ]; then
     echo "Version not set (), exiting"
     exit 1
 fi
 
-if [ -z "${_sa_pass}" ]; then
+if [ -z "${sa_pass}" ]; then
     echo "SA password not set, exiting"
     exit 1
 fi
 
-if [ -z "${_db_user}" ]; then
+if [ -z "${db_user}" ]; then
     echo "Database user not set, exiting"
     exit 1
 fi
 
-if [ -z "${_db_password}" ]; then
+if [ -z "${db_password}" ]; then
     echo "Database password not set, exiting"
     exit 1
 fi
 
-if [ -z "${_db_name}" ]; then
+if [ -z "${db_name}" ]; then
     echo "Database name not set, exiting"
     exit 1
 fi
 
+# Build image
+image_name="moxis/moodle-mssql-action"
+docker build \
+    -t $image_name \
+    --build-arg VERSION=${version} \
+    -f mssql.Dockerfile .
+
+# Generate a random container name
 id=$(tr -dc a-z0-9 </dev/urandom | head -c 10)
 container_name="mssql-server-$id"
 
 # Run the container
-command="docker run -d \
+command="docker run -d --rm\
     --name $container_name \
+    -p ${host_port}:${container_port} \
     -e ACCEPT_EULA='Y' \
-    -e SA_PASSWORD=${_sa_pass} \
-    -e INPUT_MSSQL_ROOT_PASSWORD=${_sa_pass} \
-    -e INPUT_MSSQL_PASSWORD=${_db_password} \
-    -e INPUT_MSSQL_USER=${_db_user} \
-    -e INPUT_MSSQL_DATABASE=${_db_name} \
-    mcr.microsoft.com/mssql/server:${_version}"
+    -e MSSQL_SA_PASSWORD=${sa_pass} \
+    -e INPUT_MSSQL_ROOT_PASSWORD=${sa_pass} \
+    -e INPUT_MSSQL_PASSWORD=${db_password} \
+    -e INPUT_MSSQL_USER=${db_user} \
+    -e INPUT_MSSQL_DATABASE=${db_name} \
+    $image_name:latest"
 
 sh -c "$command"
-    
-# # Wait for the container to be available

@@ -37,7 +37,7 @@ inputs:
     description: 'MSSQL_PASSWORD - password for the default user that is created'
     required: false
     default: 'test'
-  mssql_tools-path:
+  mssql_tools_path:
     description: 'Path to mssql-tools. This is used to run sqlcmd for creating custom databases, users, etc.'
     required: false
     default: '/opt/mssql-tools18/bin/sqlcmd'

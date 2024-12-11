@@ -1,5 +1,6 @@
 FROM docker:stable
 
+COPY mssql.Dockerfile /mssql.Dockerfile
 COPY entrypoint.sh /entrypoint.sh
 COPY mssql-init.sh /mssql-init.sh
 COPY mssql-entrypoint.sh /mssql-entrypoint.sh
